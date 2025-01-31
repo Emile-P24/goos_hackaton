@@ -107,6 +107,7 @@ def simulate(goos, dt=0.01, steps=1000):
         for goo in goos:
             goo.update(dt)
 
+<<<<<<< HEAD
 # +
 # --- Initialisation de Pygame ---
 pygame.init()
@@ -156,3 +157,17 @@ pygame.quit()
 
 
 
+=======
+def is_connected(start, end, goos):
+    visited = set()
+    
+    def dfs(current):
+        if current in visited:
+            return False
+        visited.add(current)
+        if current == end:
+            return True
+        return any(dfs(neighbor) for neighbor in current.links)
+    
+    return dfs(start)
+>>>>>>> origin/main
