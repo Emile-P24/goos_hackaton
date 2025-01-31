@@ -54,12 +54,15 @@ class Goo:
 
         # Dessiner les liens (ressorts)
         for other in self.links:
+            # Assure-toi que `other.position` est bien un tableau avec deux valeurs
             ox, oy = int(other.position[0]), int(600 - other.position[1])
-            pygame.draw.line(screen, (50, 50, 50), (x, y), (ox, oy), 2)  # Ligne grise
+            
+            # Vérifie que les coordonnées sont valides avant de dessiner
+            if isinstance(x, int) and isinstance(y, int) and isinstance(ox, int) and isinstance(oy, int):
+                pygame.draw.line(screen, (50, 50, 50), (x, y), (ox, oy), 2)  # Ligne grise
 
         # Dessiner la Goo
         pygame.draw.circle(screen, (0, 0, 0), (x, y), int(self.radius))
-
 
 class Platform:
     def __init__(self, points):
@@ -74,13 +77,16 @@ class Platform:
                 min_dist = dist
                 closest = p
         return closest
-
+    
     def draw(self, screen):
-        """Dessine la plateforme"""
+        """Dessine la plateforme comme une ligne"""
         for i in range(len(self.points) - 1):
+            # Conversion des coordonnées en pixels
             x1, y1 = int(self.points[i][0]), int(600 - self.points[i][1])
             x2, y2 = int(self.points[i+1][0]), int(600 - self.points[i+1][1])
-            pygame.draw.arc(screen, (100, 100, 100), (x1, y1), (x2, y2), 5)
+            
+            # Utiliser pygame.draw.line pour dessiner une ligne
+            pygame.draw.line(screen, (100, 100, 100), (x1, y1), (x2, y2), 5)
 
 
 def add_goo(goos, new_position, platforms):
@@ -155,4 +161,4 @@ pygame.quit()
 
 
 
-
+c
