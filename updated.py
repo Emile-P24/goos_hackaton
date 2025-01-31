@@ -90,7 +90,7 @@ class CirclePlatform(Platform):
 def connect_goos(goo1, goo2, space):
     rest_length = np.linalg.norm(goo1.position - goo2.position)  # Distance initiale
     stiffness = 100  # Raideur du ressort
-    damping = 0.5  # Amortissement du ressort
+    damping = 10  # Amortissement du ressort
     
     spring = pymunk.DampedSpring(goo1.body, goo2.body, (0, 0), (0, 0), rest_length, stiffness, damping)
     space.add(spring)
@@ -195,8 +195,10 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
-            add_goo(goos, (x, y), space)
-
+            if len(goos) ==0:
+                add_goo(goos, (x, y), space)
+            elif closest_targets[0] or closest_targets[1]:
+                add_goo(goos, (x, y), space)
     # Mise à jour physique
     space.step(1 / FPS)
 
