@@ -55,6 +55,25 @@ class Platform:
                 closest = p
         return closest
     
+def add_goo(goos, new_position, platforms):
+    new_goo = Goo(new_position)
+    
+    # Attacher aux Goos existants
+    for goo in goos:
+        if np.linalg.norm(new_goo.position - goo.position) <= 0.2:
+            new_goo.attach(goo)
+            goo.attach(new_goo)
+    
+    # Attacher aux plateformes
+    for platform in platforms:
+        closest_point = platform.closest_point(new_goo)
+        if np.linalg.norm(new_goo.position - closest_point) <= 0.1:
+            new_goo.attach(Goo(closest_point))  # Création d'un point fixe fictif
+    
+    # Un Goo doit avoir au moins un lien pour être valide
+    if new_goo.links:
+        goos.append(new_goo)
+
 def simulate(goos, dt=0.01, steps=1000):
     for _ in range(steps):
         for goo in goos:
