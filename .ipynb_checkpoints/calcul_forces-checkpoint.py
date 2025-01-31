@@ -13,15 +13,6 @@ class Goo:
         self.velocity = np.array([0.0, 0.0])
         self.mass = 0.4  #en kg
         self.radius = 0.01  #en m
-
-        self.body = pymunk.Body(self.mass, pymunk.moment_for_circle(self.mass, 0, self.radius))
-        self.body.position = position
-        self.shape = pymunk.Circle(self.body, self.radius)
-        self.shape.elasticity = 0.5
-        self.shape.friction = 0.5
-
-        space.add(self.body, self.shape)
-
         self.links = []  #connexions (Goos ou plateformes)
         self.rest_lengths = {}  #Longueurs au repos des ressorts
         self.k = 100  #raideur du ressort J/m²
@@ -71,12 +62,8 @@ class Goo:
 
 
 class Platform:
-    def __init__(self, x1, y1, x2, y2, space):
-        self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
-        self.shape = pymunk.Segment(self.body, (x1, y1), (x2, y2), 5)
-        self.shape.elasticity = 1.0
-        self.shape.friction = 1.0
-        space.add(self.body, self.shape)
+    def __init__(self, points):
+        self.points = [np.array(p, dtype=float) for p in points]  # Liste de points définissant la forme
     
     def closest_point(self, goo):
         min_dist = float('inf')
@@ -87,13 +74,16 @@ class Platform:
                 min_dist = dist
                 closest = p
         return closest
-
+    
     def draw(self, screen):
-        """Dessine la plateforme"""
+        """Dessine la plateforme comme une ligne"""
         for i in range(len(self.points) - 1):
+            # Conversion des coordonnées en pixels
             x1, y1 = int(self.points[i][0]), int(600 - self.points[i][1])
             x2, y2 = int(self.points[i+1][0]), int(600 - self.points[i+1][1])
-            pygame.draw.arc(screen, (100, 100, 100), (x1, y1), (x2, y2), 5)
+            
+            # Utiliser pygame.draw.line pour dessiner une ligne
+            pygame.draw.line(screen, (100, 100, 100), (x1, y1), (x2, y2), 5)
 
 
 def add_goo(goos, new_position, platforms):
@@ -166,15 +156,6 @@ pygame.quit()
 
 
 
-def is_connected(start, end, goos):
-    visited = set()
-    
-    def dfs(current):
-        if current in visited:
-            return False
-        visited.add(current)
-        if current == end:
-            return True
-        return any(dfs(neighbor) for neighbor in current.links)
-    
-    return dfs(start)
+
+
+c
