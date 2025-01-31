@@ -15,7 +15,7 @@ class Goo:
         self.body.position = position
         self.shape = pymunk.Circle(self.body, self.radius)
         self.shape.elasticity = 0.5
-        
+        self.shape.friction = 0.5
         
         # Ajouter au moteur physique
         space.add(self.body, self.shape)
@@ -25,7 +25,7 @@ class Platform:
         self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
         self.shape = pymunk.Segment(self.body, (x1, y1), (x2, y2), 5)
         self.shape.elasticity = 1.0
-        
+        self.shape.friction = 0.5
         space.add(self.body, self.shape)
 
 def connect_goos(goo1, goo2, space):
@@ -43,30 +43,59 @@ def add_goo(goos, new_position, space):
     new_goo = Goo(new_position, space)
     
     if len(goos) > 0:
-        min1= np.linalg.norm(new_goo.position - goos[0].position)
-        min2= np.linalg.norm(new_goo.position - goos[0].position)
-        
-        goomin1 = goos[0]
-        goomin2 = goos[0]
-        # Attacher aux Goos existants
+        goomin1, goomin2 = None, None
+        min1, min2 = float('inf'), float('inf')  # Start with infinity for comparisons
+
+        # Find the two closest goos
         for goo in goos:
-        
-            if np.linalg.norm(new_goo.position - goo.position) <= max(min1,min2):  # Distance max de connexion
-                if max(min1,min2) == min1:
-                    min1 = np.linalg.norm(new_goo.position - goo.position)
-                    goomin1 = goo
-                else:
-                    min2 = np.linalg.norm(new_goo.position - goo.position)
-                    goomin2 = goo
-                
-        if np.linalg.norm(new_goo.position - goomin1.position) <= 300:   
+            distance = np.linalg.norm(new_goo.position - goo.body.position)
+
+            if distance < min1:
+                min2, goomin2 = min1, goomin1  # Move the previous min1 to min2
+                min1, goomin1 = distance, goo
+            elif distance < min2:
+                min2, goomin2 = distance, goo
+
+        # Attach to the closest two goos within 200 distance
+        if goomin1 and min1 <= 200:
             connect_goos(new_goo, goomin1, space)
-        if np.linalg.norm(new_goo.position - goomin2.position) <= 300:   
+        if goomin2 and min2 <= 200:
             connect_goos(new_goo, goomin2, space)
-    
+
     goos.append(new_goo)
+
+import numpy as np
+
+def find_two_closest_targets(goos, platforms, pos):
+    closest1, closest2 = None, None
+    min1, min2 = float('inf'), float('inf')
+
+    # Check all goos
+    for goo in goos:
+        distance = np.linalg.norm(np.array(goo.body.position) - np.array(pos))
+
+        if distance < min1 and distance < 200:
+            min2, closest2 = min1, closest1  # Move the previous min1 to min2
+            min1, closest1 = distance, goo
+        elif distance < min2 and distance < 200:
+            min2, closest2 = distance, goo
+
+    # Check all platforms
+    for platform in platforms:
+        platform_pos = np.array(platform.body.position)
+        distance = np.linalg.norm(platform_pos - np.array(pos))
+
+        if distance < min1 and distance < 200:
+            min2, closest2 = min1, closest1  # Move the previous min1 to min2
+            min1, closest1 = distance, platform
+        elif distance < min2 and distance < 200:
+            min2, closest2 = distance, platform
+
+    return closest1, closest2
+
+def update():
     
-    
+    return None   
 
 # Initialisation Pygame et Pymunk
 WIDTH, HEIGHT = 800, 600
@@ -99,19 +128,26 @@ goos = []
 # Boucle principale
 running = True
 while running:
-    screen.fill((255, 255, 255))  # Fond blanc
-
+    screen.fill((200, 255, 255))  # Fond blanc
+    mouse_pos = pygame.mouse.get_pos()
+    closest_targets = find_two_closest_targets(goos, platforms, mouse_pos)
+    
     # Gestion des événements
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
+            update()
             add_goo(goos, (x, y), space)
 
     # Mise à jour physique
     space.step(1 / FPS)
-
+    
+    if closest_targets[0] and closest_targets[1]:
+        pygame.draw.line(screen, (150, 150, 150), mouse_pos, (int(closest_targets[0].body.position.x), int(closest_targets[0].body.position.y)), 1)
+        pygame.draw.line(screen, (150, 150, 150), mouse_pos, (int(closest_targets[1].body.position.x), int(closest_targets[1].body.position.y)), 1)
+        
     # Dessiner la scène
     space.debug_draw(draw_options)
 
