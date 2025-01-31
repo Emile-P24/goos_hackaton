@@ -74,13 +74,16 @@ class Platform:
                 min_dist = dist
                 closest = p
         return closest
-
+    
     def draw(self, screen):
-        """Dessine la plateforme"""
+        """Dessine la plateforme comme une ligne"""
         for i in range(len(self.points) - 1):
+            # Conversion des coordonnées en pixels
             x1, y1 = int(self.points[i][0]), int(600 - self.points[i][1])
             x2, y2 = int(self.points[i+1][0]), int(600 - self.points[i+1][1])
-            pygame.draw.arc(screen, (100, 100, 100), (x1, y1), (x2, y2), 5)
+            
+            # Utiliser pygame.draw.line pour dessiner une ligne
+            pygame.draw.line(screen, (100, 100, 100), (x1, y1), (x2, y2), 5)
 
 
 def add_goo(goos, new_position, platforms):
@@ -153,15 +156,6 @@ pygame.quit()
 
 
 
-def is_connected(start, end, goos):
-    visited = set()
-    
-    def dfs(current):
-        if current in visited:
-            return False
-        visited.add(current)
-        if current == end:
-            return True
-        return any(dfs(neighbor) for neighbor in current.links)
-    
-    return dfs(start)
+
+
+c
