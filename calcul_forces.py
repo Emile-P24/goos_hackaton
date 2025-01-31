@@ -10,6 +10,15 @@ class Goo:
         self.velocity = np.array([0.0, 0.0])
         self.mass = 0.4  #en kg
         self.radius = 0.01  #en m
+
+        self.body = pymunk.Body(self.mass, pymunk.moment_for_circle(self.mass, 0, self.radius))
+        self.body.position = position
+        self.shape = pymunk.Circle(self.body, self.radius)
+        self.shape.elasticity = 0.5
+        self.shape.friction = 0.5
+
+        space.add(self.body, self.shape)
+
         self.links = []  #connexions (Goos ou plateformes)
         self.rest_lengths = {}  #Longueurs au repos des ressorts
         self.k = 100  #raideur du ressort J/m²
@@ -42,8 +51,12 @@ class Goo:
         self.position += self.velocity * dt
     
 class Platform:
-    def __init__(self, points):
-        self.points = [np.array(p, dtype=float) for p in points]  # Liste de points définissant la forme
+    def __init__(self, x1, y1, x2, y2, space):
+        self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        self.shape = pymunk.Segment(self.body, (x1, y1), (x2, y2), 5)
+        self.shape.elasticity = 1.0
+        self.shape.friction = 1.0
+        space.add(self.body, self.shape)
     
     def closest_point(self, goo):
         min_dist = float('inf')
