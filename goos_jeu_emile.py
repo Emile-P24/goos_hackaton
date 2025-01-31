@@ -37,15 +37,36 @@ def connect_goos(goo1, goo2, space):
     space.add(spring)
     return spring
 
+
+
 def add_goo(goos, new_position, space):
     new_goo = Goo(new_position, space)
     
-    # Attacher aux Goos existants
-    for goo in goos:
-        if np.linalg.norm(new_goo.position - goo.position) <= 200:  # Distance max de connexion
-            connect_goos(new_goo, goo, space)
+    if len(goos) > 0:
+        min1= np.linalg.norm(new_goo.position - goos[0].position)
+        min2= np.linalg.norm(new_goo.position - goos[0].position)
+        
+        goomin1 = goos[0]
+        goomin2 = goos[0]
+        # Attacher aux Goos existants
+        for goo in goos:
+        
+            if np.linalg.norm(new_goo.position - goo.position) <= max(min1,min2):  # Distance max de connexion
+                if max(min1,min2) == min1:
+                    min1 = np.linalg.norm(new_goo.position - goo.position)
+                    goomin1 = goo
+                else:
+                    min2 = np.linalg.norm(new_goo.position - goo.position)
+                    goomin2 = goo
+                
+        if np.linalg.norm(new_goo.position - goomin1.position) <= 300:   
+            connect_goos(new_goo, goomin1, space)
+        if np.linalg.norm(new_goo.position - goomin2.position) <= 300:   
+            connect_goos(new_goo, goomin2, space)
     
     goos.append(new_goo)
+    
+    
 
 # Initialisation Pygame et Pymunk
 WIDTH, HEIGHT = 800, 600
