@@ -91,28 +91,3 @@ def is_connected(start, end, goos):
         return any(dfs(neighbor) for neighbor in current.links)
     
     return dfs(start)
-
-# Exemple d'utilisation
-platform1 = Platform([(0, 0), (5, 0)])
-platform2 = Platform([(10, 0), (15, 0)])
-
-goos = []
-
-# Ajouter des Goos dynamiquement
-add_goo(goos, (2, 1), [platform1, platform2])
-add_goo(goos, (3, 1), [platform1, platform2])
-add_goo(goos, (4, 2), [platform1, platform2])
-
-simulate(goos)
-
-# Vérifier s'il existe un chemin entre les plateformes
-start_goo = Goo(platform1.points[0])
-end_goo = Goo(platform2.points[0])
-if is_connected(start_goo, end_goo, goos):
-    print("Un chemin existe entre les plateformes de départ et d’arrivée.")
-else:
-    print("Aucun chemin n'existe entre les plateformes de départ et d’arrivée.")
-
-# Affichage des positions finales
-for goo in goos:
-    print(f"Position d'équilibre du Goo: {goo.position}")
